@@ -4,7 +4,7 @@ require('console-polyfill');
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const HelloWorld = require('./components/HelloWorld');
+const InputFileContainer = require('./components/InputFileContainer');
 
 
 var instances = [
@@ -952,4 +952,4 @@ var translations = {
 //   priorities={priorities}
 //   />, document.getElementById('app'));
 
-ReactDOM.render(<HelloWorld />, document.getElementById('app'));
+ReactDOM.render(<InputFileContainer />, document.getElementById('app'));
