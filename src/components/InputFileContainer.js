@@ -1,4 +1,5 @@
 const React = require('react');
+const ReactDOM = require('react-dom');
 const InputList = require('./InputList');
 const newId = require('../../utils/newId');
 
@@ -6,15 +7,48 @@ const InputFileContainer = React.createClass({
   
   getInitialState: function () {
     return {
-      inputs: ['input-0', 'input-1']
+      inputs: [],
+      labels: [],
+      inputLabels: {}
     }
   },
   
-  addInput: function () {
+    onIE8Change: function (input) {
+      var _this = this;
+       input.attachEvent && input.attachEvent('onchange', function (e, inputId) {
+          console.log('input changed', e, inputId);
+          
+          var inputId = $(e.srcElement).data('id');
+            
+          var splitted = e.srcElement.value.split('\\');
+          var fileName = splitted[splitted.length - 1];
+        
+          if (_this.state.inputs.indexOf(inputId) > -1) {
+            var newState = Object.assign({}, _this.state.inputLabels, {[inputId]: fileName});
+            console.log('new state', newState);
+            _this.setState({
+              inputLabels: newState
+            });
+          }
+          
+        });
+    },
+  
+  addInput: function (e) {
+    console.log('e.target', e.target);
+    
     var newInput = `input-${newId()}`;
     this.setState({
       inputs: [...this.state.inputs, newInput]
-    })
+    }, function () {
+
+      var input = ReactDOM.findDOMNode(this.refs['input-list'].refs[newInput]);
+      
+      this.onIE8Change(input);
+      
+      input.click();
+      
+    });
   },
   
   handleFileRemove: function (e) {
@@ -26,8 +60,19 @@ const InputFileContainer = React.createClass({
     //debugger;
   },
   
-  handleChange: function (e) {
-    debugger;
+  handleChange: function (e, inputId) {
+    //debugger;
+console.log('inside handleChange');
+    var splitted = e.target.value.split('\\');
+    var fileName = splitted[splitted.length - 1];
+    
+    if (this.state.inputs.indexOf(inputId) > -1) {
+      var newState = Object.assign({}, this.state.inputLabels, {[inputId]: fileName});
+      console.log('new state', newState);
+      this.setState({
+        inputLabels: newState
+      });
+    }
   },
   
   render: function () {
@@ -38,7 +83,12 @@ const InputFileContainer = React.createClass({
               <i className="reply-attachment-ico"></i>
            </div>
         </div>
-        <InputList ref="input-list" inputs={this.state.inputs} onFileRemove={this.handleFileRemove} onChange={this.handleChange} />
+        <InputList ref="input-list" 
+                   inputs={this.state.inputs} 
+                   labels={this.state.labels}
+                   inputLabels={this.state.inputLabels}
+                   onFileRemove={this.handleFileRemove} 
+                   onChange={this.handleChange} />
       </div>
   );
   }
